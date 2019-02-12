@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 public class CourseService {
     static ArrayList<Course> courses = new ArrayList<Course>() {
         {
@@ -30,10 +29,11 @@ public class CourseService {
     }
     @GetMapping("/api/courses")
     public List<Course> findAllCourses(HttpSession session) {
-        return CourseService.courses.stream().filter(x->x.getFacultyId()
+        List<Course> cl = CourseService.courses.stream().filter(x->x.getFacultyId()
                 ==
                 ((User)session.getAttribute("currentUser")).getId())
                 .collect(Collectors.toList());
+        return cl;
     }
 
     @GetMapping("/api/courses/{id}")
