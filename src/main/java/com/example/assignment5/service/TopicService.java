@@ -42,7 +42,7 @@ public class TopicService {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/api/Topic/{lid}")
+    @GetMapping("/api/topic/{lid}")
     public Topic findTopicById(
             @PathVariable("lid") long id) {
         for(Topic ls: TopicService.topicList) {
