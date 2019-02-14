@@ -1,6 +1,9 @@
 package com.example.assignment5.service;
 
+import com.example.assignment5.model.Course;
 import com.example.assignment5.model.Lesson;
+import com.example.assignment5.model.Module;
+import com.example.assignment5.model.Topic;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +15,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 public class LessonService {
 
     static ArrayList<Lesson> lessonList=new ArrayList<Lesson>(){
@@ -24,15 +26,17 @@ public class LessonService {
 
     @PostMapping(path = "/api/module/{mid}/lesson", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Lesson createLesson(@PathVariable("mid")Integer mid,
+    public Lesson createLesson(@PathVariable("mid")long mid,
                                @RequestBody Lesson ls) {
-        Lesson newLesson=new Lesson(ls.getId(),mid,ls.getTopics(),ls.getTitle());
+        Lesson newLesson=new Lesson(mid,ls.getId(),new ArrayList<Topic>(),ls.getTitle());
         LessonService.lessonList.add(newLesson);
+        Module parentModule=CourseService.UpdateParentModule(ls,mid,0);
+        Course parentCourse=CourseService.UpdateParentCourse(parentModule,parentModule.getCourseId(),1);
         return ls;
     }
 
-    @GetMapping(" /api/module/{mid}/lesson")
-    public List<Lesson> findAllLessons(@PathVariable("mid")Integer mid,
+    @GetMapping("/api/module/{mid}/lesson")
+    public List<Lesson> findAllLessons(@PathVariable("mid")long mid,
                                        HttpSession session) {
         return LessonService.lessonList.stream().filter(x->x.getModuleId()
                 == mid)
@@ -41,7 +45,7 @@ public class LessonService {
 
     @GetMapping("/api/lesson/{lid}")
     public Lesson findLessonById(
-            @PathVariable("lid") Integer id) {
+            @PathVariable("lid") long id) {
         for(Lesson ls: LessonService.lessonList) {
             if(id == ls.getId())
                 return ls;
@@ -51,22 +55,34 @@ public class LessonService {
 
     @PutMapping(path = "/api/lesson/{lid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Lesson updateLesson (@PathVariable("lid")Integer id,
-                               @RequestBody Lesson ls) {
+    public Lesson updateLesson (@PathVariable("lid")long id,
+                                @RequestBody Module m) {
         Optional<Lesson> x= LessonService.lessonList.stream().filter(t->t.getId()==id)
                 .findFirst();
+        final Lesson[] temp = {null};
         if(x.isPresent())
             x.ifPresent(y->{
-                y.setModuleId(ls.getModuleId());
-                y.setTitle(ls.getTitle());
-                y.setTopics(ls.getTopics());
+                temp[0] =y;
+                Lesson temp2=m.getLessons().stream().filter(z->z.getId()==id)
+                        .collect(Collectors.toList()).get(0);
+                y.setModuleId(temp2.getModuleId());
+                y.setTitle(temp2.getTitle());
+                y.setTopics(temp2.getTopics());
+                Module parentMpdule=CourseService.UpdateParentModule(y,y.getModuleId(),1);
+                Course parentCourse=CourseService.UpdateParentCourse(parentMpdule,parentMpdule.getCourseId(),1);
             });
-        return ls;
+        return temp[0];
     }
 
     @DeleteMapping("/api/lesson/{lid}")
     public void deleteLesson(
-            @PathVariable("lid") Integer id) {
+            @PathVariable("lid") long id) {
+        Lesson lessonToBeDeleted=LessonService.lessonList.stream().filter(t->t.getId()==id)
+                .collect(Collectors.toList()).get(0);
+
+        Module parentMpdule=CourseService.UpdateParentModule(lessonToBeDeleted,
+                lessonToBeDeleted.getModuleId(),2);
+        Course parentCourse=CourseService.UpdateParentCourse(parentMpdule,parentMpdule.getCourseId(),1);
         LessonService.lessonList.removeIf(x->x.getId()==id);
     }
 }
