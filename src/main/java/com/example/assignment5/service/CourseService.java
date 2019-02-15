@@ -23,7 +23,7 @@ public class CourseService {
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public Course createCourse(@RequestBody Course crs, HttpSession session) {
         crs.setFacultyId(((User)session.getAttribute("currentUser")).getId());
-
+        CourseService.courses.add(crs);
         return crs;
     }
     @GetMapping("/api/courses")
@@ -37,7 +37,7 @@ public class CourseService {
 
     @GetMapping("/api/courses/{id}")
     public Course findCourseById(
-            @PathVariable("id") Integer id) {
+            @PathVariable("id") long id) {
         for(Course crs: CourseService.courses) {
             if(id == crs.getId())
                 return crs;
@@ -47,7 +47,7 @@ public class CourseService {
 
     @PutMapping(path = "/api/courses/{cid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Course updateCourse(@PathVariable("cid")Integer id,
+    public Course updateCourse(@PathVariable("cid")long id,
                                @RequestBody Course crs) {
         Optional<Course> x= CourseService.courses.stream().filter(t->t.getId()==id).findFirst();
         if(x.isPresent())
@@ -60,7 +60,7 @@ public class CourseService {
     }
     @DeleteMapping("/api/courses/{cid}")
     public void deleteCourse(
-            @PathVariable("cid") Integer id) {
+            @PathVariable("cid") long id) {
         CourseService.courses.removeIf(x->x.getId()==id);
     }
 

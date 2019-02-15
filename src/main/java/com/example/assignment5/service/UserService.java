@@ -37,7 +37,7 @@ public class UserService {
         else
             return null;
     }
-    @PostMapping(path = "/api/profile"
+    @GetMapping(path = "/api/profile"
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public User profile(HttpSession session) {
         return (User)session.getAttribute("currentUser");
