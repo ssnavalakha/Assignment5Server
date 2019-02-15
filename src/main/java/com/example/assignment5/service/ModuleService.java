@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 public class ModuleService {
 
     static ArrayList<Module> moduleList=new ArrayList<Module>(){
@@ -26,15 +25,16 @@ public class ModuleService {
 
     @PostMapping(path = "/api/courses/{cid}/modules", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Module createModule(@PathVariable("cid")Integer cid,
+    public Module createModule(@PathVariable("cid")long cid,
                                @RequestBody Module md) {
         Module newModule=new Module(md.getId(),cid,md.getLessons(),md.getTitle());
         ModuleService.moduleList.add(newModule);
+        Course parentCourse=CourseService.UpdateParentCourse(newModule,cid,0);
         return md;
     }
 
     @GetMapping("/api/course/{cid}/modules")
-    public List<Module> findAllModules(@PathVariable("cid")Integer cid,
+    public List<Module> findAllModules(@PathVariable("cid")long cid,
                                        HttpSession session) {
         return ModuleService.moduleList.stream().filter(x->x.getCourseId()
                 == cid)
@@ -43,7 +43,7 @@ public class ModuleService {
 
     @GetMapping("/api/modules/{mid}")
     public Module findModuleById(
-            @PathVariable("mid") Integer id) {
+            @PathVariable("mid") long id) {
         for(Module md: ModuleService.moduleList) {
             if(id == md.getId())
                 return md;
@@ -53,20 +53,30 @@ public class ModuleService {
 
     @PutMapping(path = "/api/modules/{mid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Module updateCourse(@PathVariable("mid")Integer id,
-                               @RequestBody Module md) {
+    public Module updateModule(@PathVariable("mid")long id,
+                               @RequestBody Course crs) {
         Optional<Module> x= ModuleService.moduleList.stream().filter(t->t.getId()==id).findFirst();
+        final Module[] temp2 = {null};
         if(x.isPresent())
             x.ifPresent(y->{
-                y.setCourseId(md.getCourseId());
-                y.setLessons(md.getLessons());
-                y.setTitle(md.getTitle());
+                temp2[0] =y;
+                Module temp=crs.getModules().stream().filter(z->z.getId()==id)
+                        .collect(Collectors.toList()).get(0);
+                y.setCourseId(temp.getCourseId());
+                y.setLessons(temp.getLessons());
+                y.setTitle(temp.getTitle());
+                CourseService.UpdateParentCourse(y,y.getCourseId(),1);
             });
-        return md;
+        return temp2[0];
     }
     @DeleteMapping("/api/modules/{mid}")
     public void deleteModule(
-            @PathVariable("mid") Integer id) {
+            @PathVariable("mid") long id) {
+        Module moduleToBeDeleted=ModuleService.moduleList.stream()
+                .filter(x->x.getId()==id).collect(Collectors.toList()).get(0);
+
+        Course parentCourse=CourseService.UpdateParentCourse(moduleToBeDeleted,
+                moduleToBeDeleted.getCourseId(),2);
         ModuleService.moduleList.removeIf(x->x.getId()==id);
     }
 }

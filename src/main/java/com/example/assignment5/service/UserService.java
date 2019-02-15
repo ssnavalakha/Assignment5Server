@@ -13,7 +13,6 @@ import javax.servlet.http.HttpSession;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserService {
 
     User alice = new Faculty("alice","sanket", "Alice", "Wonderland",0,
@@ -38,7 +37,7 @@ public class UserService {
         else
             return null;
     }
-    @PostMapping(path = "/api/profile"
+    @GetMapping(path = "/api/profile"
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public User profile(HttpSession session) {
         return (User)session.getAttribute("currentUser");
@@ -52,6 +51,11 @@ public class UserService {
         {
             p.ifPresent(y->{
                 user.setId(y.getId());
+                user.setPhoneNumber(y.getPhoneNumber());
+                user.setRole(y.getRole());
+                user.setFirstName(y.getFirstName());
+                user.setLastName(y.getLastName());
+                user.setPassword(y.getPassword());
                 session.setAttribute("currentUser",user);
             });
             return user;

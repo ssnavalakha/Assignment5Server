@@ -5,7 +5,7 @@ import java.util.List;
 public class Topic {
     private long id;
     private long lessonId;
-    private List<Widget> widgets;
+    private List<WidgetItem> widgets;
     private String title;
 
     public Topic()
@@ -13,7 +13,7 @@ public class Topic {
 
     }
 
-    public Topic(long id, long lessonId, List<Widget> widgets, String title) {
+    public Topic(long id, long lessonId, List<WidgetItem> widgets, String title) {
         this.id = id;
         this.lessonId = lessonId;
         this.widgets = widgets;
@@ -36,11 +36,11 @@ public class Topic {
         this.lessonId = lessonId;
     }
 
-    public List<Widget> getWidgets() {
+    public List<WidgetItem> getWidgets() {
         return widgets;
     }
 
-    public void setWidgets(List<Widget> widgets) {
+    public void setWidgets(List<WidgetItem> widgets) {
         this.widgets = widgets;
     }
 

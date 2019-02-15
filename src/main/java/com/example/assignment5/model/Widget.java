@@ -15,13 +15,13 @@ public class Widget {
     private long position;
     private long up;
     private long down;
-    private TYPE type;
+    private String type;
 
     public Widget(){}
     public Widget(long id, long topicId, long size,
                   String text, List<String> items, String src, String href,
                   String title, long ddType, long position,
-                  long up, long down, TYPE type) {
+                  long up, long down, String type) {
         this.id = id;
         this.topicId = topicId;
         this.size = size;
@@ -133,11 +133,11 @@ public class Widget {
         this.down = down;
     }
 
-    public TYPE getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(TYPE type) {
+    public void setType(String type) {
         this.type = type;
     }
 }
