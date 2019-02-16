@@ -30,7 +30,7 @@ public class ModuleService {
         Module newModule=new Module(md.getId(),cid,md.getLessons(),md.getTitle());
         ModuleService.moduleList.add(newModule);
         Course parentCourse=CourseService.UpdateParentCourse(newModule,cid,0);
-        return md;
+        return newModule;
     }
 
     @GetMapping("/api/course/{cid}/modules")

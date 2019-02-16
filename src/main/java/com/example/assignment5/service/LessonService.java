@@ -30,9 +30,9 @@ public class LessonService {
                                @RequestBody Lesson ls) {
         Lesson newLesson=new Lesson(mid,ls.getId(),new ArrayList<Topic>(),ls.getTitle());
         LessonService.lessonList.add(newLesson);
-        Module parentModule=CourseService.UpdateParentModule(ls,mid,0);
+        Module parentModule=CourseService.UpdateParentModule(newLesson,mid,0);
         Course parentCourse=CourseService.UpdateParentCourse(parentModule,parentModule.getCourseId(),1);
-        return ls;
+        return newLesson;
     }
 
     @GetMapping("/api/module/{mid}/lesson")

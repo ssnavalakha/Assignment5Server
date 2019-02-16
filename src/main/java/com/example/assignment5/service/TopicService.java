@@ -31,7 +31,7 @@ public class TopicService {
         Lesson parentLesson=CourseService.UpdateParentLesson(newTopic,lid,0);
         Module parentModule=CourseService.UpdateParentModule(parentLesson,parentLesson.getModuleId(),1);
         Course parentCOurse=CourseService.UpdateParentCourse(parentModule,parentModule.getCourseId(),1);
-        return t;
+        return newTopic;
     }
 
     @GetMapping("/api/lesson/{lid}/topic")
