@@ -1,9 +1,12 @@
 package com.example.assignment5.model;
-
+import javax.persistence.*;
 import java.io.Serializable;
 
+@Entity
 public class User implements Serializable {
+    @Id
     private long id;
+
     private String username;
     private String password;
     private String firstName;
