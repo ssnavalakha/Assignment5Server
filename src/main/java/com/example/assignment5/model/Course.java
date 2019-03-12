@@ -1,10 +1,18 @@
 package com.example.assignment5.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.List;
 
+@Entity
+@Table(name="course")
 public class Course {
     private long facultyId;
+    @Id
     private long id;
+    @OneToMany(mappedBy = "course")
     private List<Module> modules;
     private String title;
 

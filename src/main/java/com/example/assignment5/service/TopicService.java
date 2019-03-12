@@ -4,6 +4,9 @@ import com.example.assignment5.model.Course;
 import com.example.assignment5.model.Lesson;
 import com.example.assignment5.model.Module;
 import com.example.assignment5.model.Topic;
+import com.example.assignment5.repositories.LessonRepository;
+import com.example.assignment5.repositories.TopicRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,39 +19,32 @@ import java.util.stream.Collectors;
 
 @RestController
 public class TopicService {
-    static ArrayList<Topic> topicList=new ArrayList<Topic>(){
-        {
-            add(new Topic(1,1,WidgetService.widgetList.stream().filter(x->x.getTopicId()==1)
-                    .collect(Collectors.toList()), "Topic1"));
-        }
-    };
+    @Autowired
+    TopicRepository repo;
+    @Autowired
+    LessonRepository lrepo;
+
     @PostMapping(path = "/api/lesson/{lid}/topic", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public Topic createTopic(@PathVariable("lid")long lid,
                              @RequestBody Topic t) {
-        Topic newTopic=new Topic(t.getId(),lid,t.getWidgets(),t.getTitle());
-        TopicService.topicList.add(newTopic);
-        Lesson parentLesson=CourseService.UpdateParentLesson(newTopic,lid,0);
-        Module parentModule=CourseService.UpdateParentModule(parentLesson,parentLesson.getModuleId(),1);
-        Course parentCOurse=CourseService.UpdateParentCourse(parentModule,parentModule.getCourseId(),1);
+        Topic newTopic=new Topic(t.getId(),lrepo.findById(lid).get(),t.getWidgets(),t.getTitle());
+        repo.save(newTopic);
         return newTopic;
     }
 
     @GetMapping("/api/lesson/{lid}/topic")
     public List<Topic> findAllTopics(@PathVariable("lid")long lid,
                                      HttpSession session) {
-        return TopicService.topicList.stream().filter(x->x.getLessonId()
-                == lid)
-                .collect(Collectors.toList());
+        return repo.findTopicByLid(lid);
     }
 
-    @GetMapping("/api/topic/{lid}")
+    @GetMapping("/api/topic/{tid}")
     public Topic findTopicById(
-            @PathVariable("lid") long id) {
-        for(Topic ls: TopicService.topicList) {
-            if(id == ls.getId())
-                return ls;
-        }
+            @PathVariable("tid") long id) {
+        Optional<Topic> t=repo.findById(id);
+        if(t.isPresent())
+            return t.get();
         return null;
     }
 
@@ -56,32 +52,24 @@ public class TopicService {
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public Topic updateTopic (@PathVariable("tid")long id,
                               @RequestBody Lesson l) {
-        Optional<Topic> x= TopicService.topicList.stream().filter(e->e.getId()==id)
-                .findFirst();
+        Optional<Topic> x= repo.findById(id);
         final Topic[] temp = {null};
         if(x.isPresent())
             x.ifPresent(y->{
                 temp[0] =y;
                 Topic temp2=l.getTopics().stream().filter(z->z.getId()==id)
                         .collect(Collectors.toList()).get(0);
-                y.setLessonId(temp2.getLessonId());
+                y.setLesson(temp2.getLesson());
                 y.setTitle(temp2.getTitle());
                 y.setWidgets(temp2.getWidgets());
-                Lesson parentLesson=CourseService.UpdateParentLesson(y,y.getLessonId(),1);
-                Module parentModule=CourseService.UpdateParentModule(parentLesson,parentLesson.getModuleId(),1);
-                Course parentCOurse=CourseService.UpdateParentCourse(parentModule,parentModule.getCourseId(),1);
-            });
+                repo.save(y);
+                });
         return temp[0];
     }
 
     @DeleteMapping("/api/topic/{tid}")
     public void deleteTopic(
             @PathVariable("tid") long id) {
-        Topic topicTobeDeleted=TopicService.topicList.stream().filter(e->e.getId()==id)
-                .collect(Collectors.toList()).get(0);
-        Lesson parentLesson=CourseService.UpdateParentLesson(topicTobeDeleted,topicTobeDeleted.getLessonId(),2);
-        Module parentModule=CourseService.UpdateParentModule(parentLesson,parentLesson.getModuleId(),1);
-        Course parentCOurse=CourseService.UpdateParentCourse(parentModule,parentModule.getCourseId(),1);
-        TopicService.topicList.removeIf(x->x.getId()==id);
+        repo.deleteById(id);
     }
 }

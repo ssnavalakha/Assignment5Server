@@ -1,13 +1,21 @@
 package com.example.assignment5.model;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.util.List;
 
+@Entity
 public class Widget {
 
+    @Id
     private long id;
-    private long topicId;
+    @ManyToOne()
+    @JoinColumn(name = "topic_id")
+    private Topic topic;
     private long size;
     private String text;
-    List<String>items;
+    String items;
     private String src;
     private String href;
     private String title;
@@ -18,12 +26,12 @@ public class Widget {
     private String type;
 
     public Widget(){}
-    public Widget(long id, long topicId, long size,
-                  String text, List<String> items, String src, String href,
+    public Widget(long id, Topic topic, long size,
+                  String text, String items, String src, String href,
                   String title, long ddType, long position,
                   long up, long down, String type) {
         this.id = id;
-        this.topicId = topicId;
+        this.topic = topic;
         this.size = size;
         this.text = text;
         this.items = items;
@@ -45,12 +53,12 @@ public class Widget {
         this.id = id;
     }
 
-    public long getTopicId() {
-        return topicId;
+    public Topic getTopic() {
+        return topic;
     }
 
-    public void setTopicId(long topicId) {
-        this.topicId = topicId;
+    public void setTopicId(Topic topic) {
+        this.topic = topic;
     }
 
     public long getSize() {
@@ -69,11 +77,11 @@ public class Widget {
         this.text = text;
     }
 
-    public List<String> getItems() {
+    public String getItems() {
         return items;
     }
 
-    public void setItems(List<String> items) {
+    public void setItems(String items) {
         this.items = items;
     }
 
