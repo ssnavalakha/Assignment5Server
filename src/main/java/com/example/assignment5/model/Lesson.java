@@ -16,6 +16,7 @@ public class Lesson {
 
     @ManyToOne()
     @JoinColumn(name = "module_id")
+    @JsonIgnore
     private Module module;
 
     public Lesson(){}

@@ -22,7 +22,7 @@ public class CourseService {
     @PostMapping(path = "/api/courses",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public Course createCourse(@RequestBody Course crs, HttpSession session) {
-        crs.setFacultyId(((User)session.getAttribute("currentUser")).getId());
+        crs.setUser(((User)session.getAttribute("currentUser")));
         repo.save(crs);
         return crs;
     }
@@ -30,7 +30,7 @@ public class CourseService {
     public List<Course> findAllCourses(HttpSession session) {
         List<Course> all=new ArrayList<Course>();
         repo.findAll().forEach(all::add);
-        List<Course> cl = all.stream().filter(x->x.getFacultyId()
+        List<Course> cl = all.stream().filter(x->x.getUser().getId()
                 ==
                 ((User)session.getAttribute("currentUser")).getId())
                 .collect(Collectors.toList());
@@ -56,7 +56,7 @@ public class CourseService {
         if(x.isPresent())
             x.ifPresent(y->{
                 y.setModules(crs.getModules());
-                y.setFacultyId(crs.getFacultyId());
+                y.setUser(crs.getUser());
                 y.setTitle(crs.getTitle());
                 repo.save(y);
             });

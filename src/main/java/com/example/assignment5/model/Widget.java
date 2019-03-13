@@ -1,4 +1,6 @@
 package com.example.assignment5.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -12,6 +14,7 @@ public class Widget {
     private long id;
     @ManyToOne()
     @JoinColumn(name = "topic_id")
+    @JsonIgnore
     private Topic topic;
     private long size;
     private String text;
@@ -57,7 +60,7 @@ public class Widget {
         return topic;
     }
 
-    public void setTopicId(Topic topic) {
+    public void setTopic(Topic topic) {
         this.topic = topic;
     }
 

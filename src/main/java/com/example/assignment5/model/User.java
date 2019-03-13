@@ -1,6 +1,7 @@
 package com.example.assignment5.model;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 public class User implements Serializable {
@@ -13,6 +14,9 @@ public class User implements Serializable {
     private String lastName;
     private String role;
     private int phoneNumber;
+
+    @OneToMany(mappedBy = "user")
+    private List<Course> courses;
 
     public User() {}
     protected User(String username,String password, String firstName, String lastName,String role,long id

@@ -15,6 +15,7 @@ public class Topic {
     private String title;
     @ManyToOne()
     @JoinColumn(name = "lesson_id")
+    @JsonIgnore
     private Lesson lesson;
 
 
