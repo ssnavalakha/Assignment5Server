@@ -1,11 +1,9 @@
 package com.example.assignment5.service;
 
-import com.example.assignment5.model.Course;
-import com.example.assignment5.model.Lesson;
-import com.example.assignment5.model.Module;
-import com.example.assignment5.model.Topic;
+import com.example.assignment5.model.*;
 import com.example.assignment5.repositories.LessonRepository;
 import com.example.assignment5.repositories.TopicRepository;
+import com.example.assignment5.repositories.WidgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +21,8 @@ public class TopicService {
     TopicRepository repo;
     @Autowired
     LessonRepository lrepo;
+    @Autowired
+    WidgetRepository wrepo;
 
     @PostMapping(path = "/api/lesson/{lid}/topic", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -33,10 +33,30 @@ public class TopicService {
         return newTopic;
     }
 
+    @PostMapping(path = "/api/topic/{tid}/widget", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+            ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public Widget createWidget(@PathVariable("tid")long tid
+                               ,@RequestBody WidgetItem w) {
+        Widget newWidget=w.getWidget();
+        wrepo.save(newWidget);
+        return newWidget;
+    }
+
     @GetMapping("/api/lesson/{lid}/topic")
     public List<Topic> findAllTopics(@PathVariable("lid")long lid,
                                      HttpSession session) {
         return repo.findTopicByLid(lid);
+    }
+
+    @GetMapping("/api/topic/{tid}/widget")
+    public List<Widget> findAllWidgetsForTopic(@PathVariable("tid")long tid,
+                                     HttpSession session) {
+        return wrepo.findWidgetByTid(tid);
+    }
+
+    @GetMapping("/api/topic/widgets")
+    public List<Widget> findAllWidgets(HttpSession session) {
+        return (List<Widget>) wrepo.findAll();
     }
 
     @GetMapping("/api/topic/{tid}")

@@ -1,44 +1,39 @@
 package com.example.assignment5.service;
 
-import com.example.assignment5.model.TYPE;
-import com.example.assignment5.model.Widget;
-import com.example.assignment5.model.WidgetItem;
-import com.example.assignment5.repositories.TopicRepository;
-import com.example.assignment5.repositories.WidgetRepository;
+import com.example.assignment5.model.HeadingWidget;
+import com.example.assignment5.repositories.HeadingWidgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class WidgetService {
-
+public class HeadingWidgetService {
     @Autowired
-    WidgetRepository repo;
+    HeadingWidgetRepository repo;
 
-    @GetMapping("/api/widget/{wid}")
-    public Widget findWidgetById(
-            @PathVariable("wid") long id) {
-        Optional<Widget> t=repo.findById(id);
+    @GetMapping("/api/heading/widget/{wid}")
+    public HeadingWidget findHeadingWidgetById(@PathVariable("wid") long id){
+        Optional<HeadingWidget> t=repo.findById(id);
         if(t.isPresent())
             return t.get();
         return null;
     }
 
-    @PutMapping(path = "/api/widget/{wid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+    @PutMapping(path = "/api/heading/widget/{wid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Widget updateWidget (@PathVariable("wid")long id,
-                              @RequestBody Widget w) {
-        Optional<Widget> x= repo.findById(id);
-        final Widget[] temp = {null};
+    public HeadingWidget updateWidget (@PathVariable("wid")long id,
+                                @RequestBody HeadingWidget w) {
+        Optional<HeadingWidget> x= repo.findById(id);
+        final HeadingWidget[] temp = {null};
         if(x.isPresent())
             x.ifPresent(y->{
                 temp[0] =y;
                 y.setDown(w.getDown());
                 y.setPosition(w.getPosition());
+                y.setSize(w.getSize());
+                y.setText(w.getText());
                 y.setTopic(w.getTopic());
                 y.setUp(w.getUp());
                 y.setType(w.getType());
@@ -47,7 +42,7 @@ public class WidgetService {
         return temp[0];
     }
 
-    @DeleteMapping("/api/widget/{wid}")
+    @DeleteMapping("/api/heading/widget/{wid}")
     public void deleteWidget(
             @PathVariable("wid") long id) {
         repo.deleteById(id);

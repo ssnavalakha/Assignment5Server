@@ -1,44 +1,40 @@
 package com.example.assignment5.service;
 
-import com.example.assignment5.model.TYPE;
-import com.example.assignment5.model.Widget;
-import com.example.assignment5.model.WidgetItem;
-import com.example.assignment5.repositories.TopicRepository;
+import com.example.assignment5.model.ParagraphWidget;
+import com.example.assignment5.repositories.ParagraphWidgetRepository;
 import com.example.assignment5.repositories.WidgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class WidgetService {
-
+public class ParagraphWidgetService {
     @Autowired
-    WidgetRepository repo;
+    ParagraphWidgetRepository repo;
 
-    @GetMapping("/api/widget/{wid}")
-    public Widget findWidgetById(
+    @GetMapping("/api/paragraph/widget/{wid}")
+    public ParagraphWidget findWidgetById(
             @PathVariable("wid") long id) {
-        Optional<Widget> t=repo.findById(id);
+        Optional<ParagraphWidget> t=repo.findById(id);
         if(t.isPresent())
             return t.get();
         return null;
     }
 
-    @PutMapping(path = "/api/widget/{wid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+    @PutMapping(path = "/api/paragraph/widget/{wid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Widget updateWidget (@PathVariable("wid")long id,
-                              @RequestBody Widget w) {
-        Optional<Widget> x= repo.findById(id);
-        final Widget[] temp = {null};
+    public ParagraphWidget updateWidget (@PathVariable("wid")long id,
+                                @RequestBody ParagraphWidget w) {
+        Optional<ParagraphWidget> x= repo.findById(id);
+        final ParagraphWidget[] temp = {null};
         if(x.isPresent())
             x.ifPresent(y->{
                 temp[0] =y;
                 y.setDown(w.getDown());
                 y.setPosition(w.getPosition());
+                y.setText(w.getText());
                 y.setTopic(w.getTopic());
                 y.setUp(w.getUp());
                 y.setType(w.getType());
@@ -47,7 +43,7 @@ public class WidgetService {
         return temp[0];
     }
 
-    @DeleteMapping("/api/widget/{wid}")
+    @DeleteMapping("/api/paragraph/widget/{wid}")
     public void deleteWidget(
             @PathVariable("wid") long id) {
         repo.deleteById(id);

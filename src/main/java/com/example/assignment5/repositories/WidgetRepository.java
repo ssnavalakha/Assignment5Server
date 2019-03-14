@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface WidgetRepository extends CrudRepository<Widget,Long> {
     @Query("SELECT widget from Widget widget WHERE widget.topic.id=:tid ")
-    public List<Topic> findWidgetByTid
+    public List<Widget> findWidgetByTid
             (@Param("tid") long tid);
 }
