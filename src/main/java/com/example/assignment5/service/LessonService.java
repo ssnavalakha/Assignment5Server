@@ -69,9 +69,9 @@ public class LessonService {
                 temp[0] =y;
                 Lesson temp2=m.getLessons().stream().filter(z->z.getId()==id)
                         .collect(Collectors.toList()).get(0);
-                y.setModule(temp2.getModule());
+                //y.setModule(temp2.getModule());
                 y.setTitle(temp2.getTitle());
-                y.setTopics(temp2.getTopics());
+                //y.setTopics(temp2.getTopics());
                 repo.save(y);
             });
         return temp[0];

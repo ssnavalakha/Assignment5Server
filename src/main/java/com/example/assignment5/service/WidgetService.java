@@ -39,7 +39,7 @@ public class WidgetService {
                 temp[0] =y;
                 y.setDown(w.getDown());
                 y.setPosition(w.getPosition());
-                y.setTopic(w.getTopic());
+                //y.setTopic(w.getTopic());
                 y.setUp(w.getUp());
                 y.setType(w.getType());
                 repo.save(y);

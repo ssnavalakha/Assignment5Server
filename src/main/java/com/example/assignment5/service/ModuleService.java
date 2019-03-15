@@ -68,8 +68,8 @@ public class ModuleService {
                 temp2[0] =y;
                 Module temp=crs.getModules().stream().filter(z->z.getId()==id)
                         .collect(Collectors.toList()).get(0);
-                y.setCourse(temp.getCourse());
-                y.setLessons(temp.getLessons());
+                //y.setCourse(temp.getCourse());
+                //y.setLessons(temp.getLessons());
                 y.setTitle(temp.getTitle());
                 repo.save(y);
             });

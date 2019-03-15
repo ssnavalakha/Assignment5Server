@@ -68,7 +68,7 @@ public class CourseService {
         if(x.isPresent())
             x.ifPresent(y->{
                 y.setModules(crs.getModules());
-                y.setUser(crs.getUser());
+                //y.setUser(crs.getUser());
                 y.setTitle(crs.getTitle());
                 repo.save(y);
             });

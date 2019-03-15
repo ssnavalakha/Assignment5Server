@@ -20,6 +20,8 @@ public class LinkWidget extends Widget {
         this.title = title;
     }
 
+    public LinkWidget(){}
+
     public String getHref() {
         return href;
     }

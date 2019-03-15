@@ -108,9 +108,9 @@ public class TopicService {
                 temp[0] =y;
                 Topic temp2=l.getTopics().stream().filter(z->z.getId()==id)
                         .collect(Collectors.toList()).get(0);
-                y.setLesson(temp2.getLesson());
+                //y.setLesson(temp2.getLesson());
                 y.setTitle(temp2.getTitle());
-                y.setWidgets(temp2.getWidgets());
+                //y.setWidgets(temp2.getWidgets());
                 repo.save(y);
                 });
         return temp[0];

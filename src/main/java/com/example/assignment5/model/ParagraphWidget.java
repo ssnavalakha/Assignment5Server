@@ -24,4 +24,9 @@ public class ParagraphWidget extends Widget {
     public ParagraphWidget(String text) {
         this.text = text;
     }
+
+    public ParagraphWidget()
+    {
+
+    }
 }

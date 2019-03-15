@@ -14,9 +14,8 @@ public class ListWidget extends Widget {
 
     }
 
-    public ListWidget(String items, long ddType) {
+    public ListWidget(String items) {
         this.items = items;
-
     }
 
     public ListWidget(){}
