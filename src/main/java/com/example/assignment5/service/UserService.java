@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.assignment5.model.*;
+import com.example.assignment5.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,22 +17,15 @@ import javax.servlet.http.HttpSession;
 @RestController
 public class UserService {
 
-    User alice = new Faculty("alice","sanket", "Alice", "Wonderland",0,
-            999);
-    User bob   = new Faculty("bob","sanket", "Bob", "Marley",
-            1,311);
+    @Autowired
+    UserRepository repo;
 
-    ArrayList<User> users = new ArrayList<User>() {
-        {
-            add(alice);
-            add(bob);
-        }
-    };
+
     @PostMapping(path = "/api/register")
     public User register(@RequestBody User user,HttpSession session) {
-        if(!users.stream().allMatch(x->x.getUsername().equals(user.getUsername())))
+        if(!repo.existsByUsername(user.getUsername()))
         {
-            users.add(user);
+            repo.save(user);
             session.setAttribute("currentUser",user);
             return user;
         }
@@ -45,19 +40,17 @@ public class UserService {
 
     @PostMapping(path = "/api/login")
     public User login(@RequestBody User user,HttpSession session) {
-        Optional<User> p=users.stream().filter(x->x.getUsername().equals(user.getUsername()) &&
-                x.getPassword().equals(user.getPassword())).findFirst();
-        if(p.isPresent())
+        List<User> p=repo.findUserByCredentials(user.getUsername(),user.getPassword());
+        if(p.size()>0)
         {
-            p.ifPresent(y->{
-                user.setId(y.getId());
-                user.setPhoneNumber(y.getPhoneNumber());
-                user.setRole(y.getRole());
-                user.setFirstName(y.getFirstName());
-                user.setLastName(y.getLastName());
-                user.setPassword(y.getPassword());
-                session.setAttribute("currentUser",user);
-            });
+            User y= p.get(0);
+            user.setId(y.getId());
+            user.setPhoneNumber(y.getPhoneNumber());
+            user.setRole(y.getRole());
+            user.setFirstName(y.getFirstName());
+            user.setLastName(y.getLastName());
+            user.setPassword(y.getPassword());
+            session.setAttribute("currentUser",user);
             return user;
         }
         else
@@ -73,23 +66,24 @@ public class UserService {
 
     @GetMapping("/api/users")
     public List<User> findAllUser() {
-        return users;
+        List all=new ArrayList<User>();
+        repo.findAll().forEach(all::add);
+        return all;
     }
 
     @GetMapping("/api/users/{id}")
     public User findUserById(
-            @PathVariable("id") Integer id) {
-        for(User user: users) {
-            if(id == user.getId())
-                return user;
-        }
+            @PathVariable("id") Long id) {
+        Optional<User> u=repo.findById(id);
+        if(u.isPresent())
+            return u.get();
         return null;
     }
 
     @PutMapping(path = "/api/updateUser/{userId}")
     public User updateUser(@PathVariable("userId")Integer id,
                            @RequestBody User user) {
-        Optional<User> x= users.stream().filter(t->t.getId()==id).findFirst();
+        Optional<User> x= repo.findById(user.getId());
         if(x.isPresent())
             x.ifPresent(y->{
                 y.setFirstName(user.getFirstName());
@@ -99,6 +93,7 @@ public class UserService {
                 y.setPassword(user.getPassword());
                 y.setRole(user.getRole());
                 y.setPhoneNumber(user.getPhoneNumber());
+                repo.save(y);
             });
         return user;
     }

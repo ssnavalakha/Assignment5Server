@@ -1,6 +1,8 @@
 package com.example.assignment5.service;
 
 import com.example.assignment5.model.*;
+import com.example.assignment5.repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,22 +15,34 @@ import java.util.stream.Collectors;
 
 @RestController
 public class CourseService {
-    static ArrayList<Course> courses = new ArrayList<Course>() {
-        {
-            add(new Course(0,1,ModuleService.moduleList.stream().filter(x->(x.getCourseId()==1))
-                    .collect(Collectors.toList()), "CS5610"));
-        }
-    };
+    @Autowired
+    CourseRepository repo;
+    @Autowired
+    ModuleRepository mrepo;
+
+    @Autowired
+    LessonRepository lrepo;
+
+    @Autowired
+    TopicRepository trepo;
+
+    @Autowired
+    WidgetRepository wrepo;
+
+
+
     @PostMapping(path = "/api/courses",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public Course createCourse(@RequestBody Course crs, HttpSession session) {
-        crs.setFacultyId(((User)session.getAttribute("currentUser")).getId());
-        CourseService.courses.add(crs);
+        crs.setUser(((User)session.getAttribute("currentUser")));
+        repo.save(crs);
         return crs;
     }
     @GetMapping("/api/courses")
     public List<Course> findAllCourses(HttpSession session) {
-        List<Course> cl = CourseService.courses.stream().filter(x->x.getFacultyId()
+        List<Course> all=new ArrayList<Course>();
+        repo.findAll().forEach(all::add);
+        List<Course> cl = all.stream().filter(x->x.getUser().getId()
                 ==
                 ((User)session.getAttribute("currentUser")).getId())
                 .collect(Collectors.toList());
@@ -38,9 +52,10 @@ public class CourseService {
     @GetMapping("/api/courses/{id}")
     public Course findCourseById(
             @PathVariable("id") long id) {
-        for(Course crs: CourseService.courses) {
-            if(id == crs.getId())
-                return crs;
+        Optional<Course> crs=repo.findById(id);
+        if(crs.isPresent())
+        {
+            return crs.get();
         }
         return null;
     }
@@ -49,96 +64,35 @@ public class CourseService {
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public Course updateCourse(@PathVariable("cid")long id,
                                @RequestBody Course crs) {
-        Optional<Course> x= CourseService.courses.stream().filter(t->t.getId()==id).findFirst();
+        Optional<Course> x= repo.findById(id);
         if(x.isPresent())
             x.ifPresent(y->{
                 y.setModules(crs.getModules());
-                y.setFacultyId(crs.getFacultyId());
+                //y.setUser(crs.getUser());
                 y.setTitle(crs.getTitle());
+                repo.save(y);
             });
         return crs;
     }
     @DeleteMapping("/api/courses/{cid}")
     public void deleteCourse(
             @PathVariable("cid") long id) {
-        CourseService.courses.removeIf(x->x.getId()==id);
-    }
-
-    static Lesson UpdateParentLesson(Topic t,long lid,int action)
-    {
-        Lesson parentLesson=LessonService.lessonList.stream().filter(z->z.getId()==lid)
-                .collect(Collectors.toList()).get(0);
-        List<Topic> tl=tl=parentLesson.getTopics();;
-        if(action==0)
+        List<Module> m=mrepo.findModulesByCid(id);
+        for (int i=0;i<m.size();i++)
         {
-            tl.add(t);
+            List<Lesson> l=lrepo.findLessonByMid(m.get(i).getId());
+            for (int j=0;j<l.size();j++)
+            {
+                List<Topic> t=trepo.findTopicByLid(l.get(j).getId());
+                for (int k=0;k<t.size();k++)
+                {
+                    wrepo.deleteByTopicId(t.get(k).getId());
+                }
+                trepo.deleteByLessonId(l.get(j).getId());
+            }
+            lrepo.deleteByModuleId(m.get(i).getId());
         }
-        if(action==1)
-        {
-            Topic oldTopic=tl.stream().filter(z->z.getId()==t.getId())
-                    .collect(Collectors.toList()).get(0);
-            tl.remove(oldTopic);
-            tl.add(t);
-        }
-        if(action==2)
-        {
-            Topic oldTopic=tl.stream().filter(z->z.getId()==t.getId())
-                    .collect(Collectors.toList()).get(0);
-            tl.remove(oldTopic);
-        }
-        parentLesson.setTopics(tl);
-        return parentLesson;
-    }
-
-    static Module UpdateParentModule(Lesson ls,long mid,int action)
-    {
-        Module parentModule=ModuleService.moduleList.stream().filter(z->z.getId()==mid)
-                .collect(Collectors.toList()).get(0);
-        List<Lesson> ll=parentModule.getLessons();
-        if(action==0)
-        {
-            ll.add(ls);
-        }
-        if(action==1)
-        {
-            Lesson oldLesson=ll.stream().filter(z->z.getId()==ls.getId())
-                    .collect(Collectors.toList()).get(0);
-            ll.remove(oldLesson);
-            ll.add(ls);
-        }
-        if(action==2)
-        {
-            Lesson oldLesson=ll.stream().filter(z->z.getId()==ls.getId())
-                    .collect(Collectors.toList()).get(0);
-            ll.remove(oldLesson);
-        }
-        parentModule.setLessons(ll);
-        return parentModule;
-    }
-
-    static Course UpdateParentCourse(Module md,long cid,int action)
-    {
-        Course crs=CourseService.courses.stream().filter(z->z.getId()==cid)
-                .collect(Collectors.toList()).get(0);
-        List<Module>ml=crs.getModules();
-        if(action==0)
-        {
-            ml.add(md);
-        }
-        if(action==1)
-        {
-            Module oldModule=ml.stream().filter(z->z.getId()==md.getId())
-                    .collect(Collectors.toList()).get(0);
-            ml.remove(oldModule);
-            ml.add(md);
-        }
-        if(action==2)
-        {
-            Module oldModule=ml.stream().filter(z->z.getId()==md.getId())
-                    .collect(Collectors.toList()).get(0);
-            ml.remove(oldModule);
-        }
-        crs.setModules(ml);
-        return crs;
+        mrepo.deleteByCourseId(id);
+        repo.deleteById(id);
     }
 }

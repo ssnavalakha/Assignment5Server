@@ -1,28 +1,39 @@
 package com.example.assignment5.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import java.util.List;
 
+@Entity
+@Table(name="lesson")
 public class Lesson {
-    private long moduleId;
+    @Id
     private long id;
+    @OneToMany(mappedBy = "lesson")
     private List<Topic> topics;
     private String title;
 
+    @ManyToOne()
+    @JoinColumn(name = "module_id")
+    @JsonIgnore
+    private Module module;
+
     public Lesson(){}
 
-    public Lesson(long moduleId, long id, List<Topic> topics, String title) {
-        this.moduleId = moduleId;
+    public Lesson(Module moduleId, long id, List<Topic> topics, String title) {
+        this.module = moduleId;
         this.id = id;
         this.topics = topics;
         this.title = title;
     }
 
-    public long getModuleId() {
-        return moduleId;
+    public Module getModule() {
+        return module;
     }
 
-    public void setModuleId(long moduleId) {
-        this.moduleId = moduleId;
+    public void setModule(Module module) {
+        this.module = module;
     }
 
     public long getId() {

@@ -1,18 +1,29 @@
 package com.example.assignment5.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import java.util.List;
 
+@Entity
+@Table(name="module")
 public class Module {
+    @Id
     private long id;
-    private long courseId;
+    @OneToMany(mappedBy = "module")
     private List<Lesson> lessons;
     private String title;
 
+    @ManyToOne()
+    @JoinColumn(name = "course_id")
+    @JsonIgnore
+    private Course course;
+
     public Module(){}
 
-    public Module(long id, long courseId, List<Lesson> lessons, String title) {
+    public Module(long id, Course course, List<Lesson> lessons, String title) {
         this.id = id;
-        this.courseId = courseId;
+        this.course = course;
         this.lessons = lessons;
         this.title = title;
     }
@@ -25,12 +36,12 @@ public class Module {
         this.id = id;
     }
 
-    public long getCourseId() {
-        return courseId;
+    public Course getCourse() {
+        return course;
     }
 
-    public void setCourseId(long courseId) {
-        this.courseId = courseId;
+    public void setCourse(Course course) {
+        this.course = course;
     }
 
     public List<Lesson> getLessons() {

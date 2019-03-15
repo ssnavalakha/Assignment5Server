@@ -1,40 +1,37 @@
 package com.example.assignment5.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import java.util.List;
 
+@Entity
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
 public class Widget {
 
+    @Id
     private long id;
-    private long topicId;
-    private long size;
-    private String text;
-    List<String>items;
-    private String src;
-    private String href;
-    private String title;
-    private long ddType;
+    @ManyToOne()
+    @JoinColumn(name = "topic_id")
+    @JsonIgnore
+    private Topic topic;
     private long position;
     private long up;
     private long down;
     private String type;
 
+    private long ddType;
+
     public Widget(){}
-    public Widget(long id, long topicId, long size,
-                  String text, List<String> items, String src, String href,
-                  String title, long ddType, long position,
-                  long up, long down, String type) {
+    public Widget(long id, Topic topic, long position,
+                  long up, long down, String type,long ddType) {
         this.id = id;
-        this.topicId = topicId;
-        this.size = size;
-        this.text = text;
-        this.items = items;
-        this.src = src;
-        this.href = href;
-        this.title = title;
-        this.ddType = ddType;
+        this.topic = topic;
         this.position = position;
         this.up = up;
         this.down = down;
         this.type = type;
+        this.ddType=ddType;
     }
 
     public long getId() {
@@ -45,68 +42,12 @@ public class Widget {
         this.id = id;
     }
 
-    public long getTopicId() {
-        return topicId;
+    public Topic getTopic() {
+        return topic;
     }
 
-    public void setTopicId(long topicId) {
-        this.topicId = topicId;
-    }
-
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public List<String> getItems() {
-        return items;
-    }
-
-    public void setItems(List<String> items) {
-        this.items = items;
-    }
-
-    public String getSrc() {
-        return src;
-    }
-
-    public void setSrc(String src) {
-        this.src = src;
-    }
-
-    public String getHref() {
-        return href;
-    }
-
-    public void setHref(String href) {
-        this.href = href;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public long getDdType() {
-        return ddType;
-    }
-
-    public void setDdType(long ddType) {
-        this.ddType = ddType;
+    public void setTopic(Topic topic) {
+        this.topic = topic;
     }
 
     public long getPosition() {
@@ -140,4 +81,8 @@ public class Widget {
     public void setType(String type) {
         this.type = type;
     }
+
+    public void setDdType(long ddType){this.ddType=ddType;}
+
+    public long getDdType(){return this.ddType;}
 }
