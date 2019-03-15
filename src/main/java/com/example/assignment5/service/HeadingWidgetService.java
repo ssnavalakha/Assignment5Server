@@ -2,6 +2,7 @@ package com.example.assignment5.service;
 
 import com.example.assignment5.model.HeadingWidget;
 import com.example.assignment5.repositories.HeadingWidgetRepository;
+import com.example.assignment5.repositories.WidgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,9 @@ import java.util.Optional;
 public class HeadingWidgetService {
     @Autowired
     HeadingWidgetRepository repo;
+
+    @Autowired
+    WidgetRepository wrepo;
 
     @GetMapping("/api/heading/widget/{wid}")
     public HeadingWidget findHeadingWidgetById(@PathVariable("wid") long id){
@@ -34,9 +38,11 @@ public class HeadingWidgetService {
                 y.setPosition(w.getPosition());
                 y.setSize(w.getSize());
                 y.setText(w.getText());
-                y.setTopic(w.getTopic());
+                //y.setTopic(w.getTopic());
                 y.setUp(w.getUp());
                 y.setType(w.getType());
+                if(!y.getType().equals("HEADING"))
+                    wrepo.deleteById(y.getId());
                 repo.save(y);
             });
         return temp[0];

@@ -13,6 +13,8 @@ import java.util.Optional;
 public class ImageWidgetService {
     @Autowired
     ImageWidgetRepository repo;
+    @Autowired
+    WidgetRepository wrepo;
 
     @GetMapping("/api/image/widget/{wid}")
     public ImageWidget findWidgetById(
@@ -34,10 +36,12 @@ public class ImageWidgetService {
                 temp[0] =y;
                 y.setDown(w.getDown());
                 y.setPosition(w.getPosition());
-                y.setTopic(w.getTopic());
+                //y.setTopic(w.getTopic());
                 y.setSrc(w.getSrc());
                 y.setUp(w.getUp());
                 y.setType(w.getType());
+                if(!y.getType().equals("IMAGE"))
+                    wrepo.deleteById(y.getId());
                 repo.save(y);
             });
         return temp[0];

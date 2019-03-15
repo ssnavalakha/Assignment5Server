@@ -1,10 +1,7 @@
 package com.example.assignment5.service;
 
-import com.example.assignment5.model.Course;
-import com.example.assignment5.model.Module;
-import com.example.assignment5.model.User;
-import com.example.assignment5.repositories.CourseRepository;
-import com.example.assignment5.repositories.ModuleRepository;
+import com.example.assignment5.model.*;
+import com.example.assignment5.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +20,15 @@ public class ModuleService {
     ModuleRepository repo;
     @Autowired
     CourseRepository crepo;
+
+    @Autowired
+    LessonRepository lrepo;
+
+    @Autowired
+    TopicRepository trepo;
+
+    @Autowired
+    WidgetRepository wrepo;
 
     @PostMapping(path = "/api/courses/{cid}/modules", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -72,6 +78,16 @@ public class ModuleService {
     @DeleteMapping("/api/modules/{mid}")
     public void deleteModule(
             @PathVariable("mid") long id) {
+        List<Lesson> l=lrepo.findLessonByMid(id);
+        for (int i=0;i<l.size();i++)
+        {
+            List<Topic> t=trepo.findTopicByLid(l.get(i).getId());
+            for (int j=0;j<t.size();j++) {
+                wrepo.deleteByTopicId(t.get(j).getId());
+            }
+            trepo.deleteByLessonId(l.get(i).getId());
+        }
+        lrepo.deleteByModuleId(id);
         repo.deleteById(id);
     }
 }

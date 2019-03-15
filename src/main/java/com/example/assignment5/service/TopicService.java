@@ -1,9 +1,7 @@
 package com.example.assignment5.service;
 
 import com.example.assignment5.model.*;
-import com.example.assignment5.repositories.LessonRepository;
-import com.example.assignment5.repositories.TopicRepository;
-import com.example.assignment5.repositories.WidgetRepository;
+import com.example.assignment5.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +21,17 @@ public class TopicService {
     LessonRepository lrepo;
     @Autowired
     WidgetRepository wrepo;
+    @Autowired
+    HeadingWidgetRepository hrepo;
+    @Autowired
+    ParagraphWidgetRepository prepo;
+    @Autowired
+    LinkWidgetRepository linkrepo;
+    @Autowired
+    ListWidgetRepository listRepo;
+    @Autowired
+    ImageWidgetRepository iRepo;
+
 
     @PostMapping(path = "/api/lesson/{lid}/topic", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -35,11 +44,25 @@ public class TopicService {
 
     @PostMapping(path = "/api/topic/{tid}/widget", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public Widget createWidget(@PathVariable("tid")long tid
+    public WidgetItem createWidget(@PathVariable("tid")long tid
                                ,@RequestBody WidgetItem w) {
-        Widget newWidget=w.getWidget();
-        wrepo.save(newWidget);
-        return newWidget;
+
+        if(w.getType().equals("HEADING"))
+            hrepo.save(new HeadingWidget(w.getId(),repo.findById(tid).get(),w.getPosition(),w.getUp()
+                    ,w.getDown(),w.getType(),w.getSize(),w.getText()));
+        if(w.getType().equals("LIST"))
+            listRepo.save(new ListWidget(w.getId(),repo.findById(tid).get(),w.getPosition(),w.getUp()
+                    ,w.getDown(),w.getType(),w.getItems(),w.getDdType()));
+        if(w.getType().equals("LINK"))
+            linkrepo.save(new LinkWidget(w.getId(),repo.findById(tid).get(),w.getPosition(),w.getUp()
+                    ,w.getDown(),w.getType(),w.getHref(),w.getTitle()));
+        if(w.getType().equals("IMAGE"))
+            iRepo.save(new ImageWidget(w.getId(),repo.findById(tid).get(),w.getPosition(),w.getUp()
+                    ,w.getDown(),w.getType(),w.getSrc()));
+        if(w.getType().equals("PARAGRAPH"))
+            prepo.save(new ParagraphWidget(w.getId(),repo.findById(tid).get(),w.getPosition(),w.getUp()
+                    ,w.getDown(),w.getType(),w.getText()));
+        return w;
     }
 
     @GetMapping("/api/lesson/{lid}/topic")
@@ -55,8 +78,14 @@ public class TopicService {
     }
 
     @GetMapping("/api/topic/widgets")
-    public List<Widget> findAllWidgets(HttpSession session) {
-        return (List<Widget>) wrepo.findAll();
+    public List<Object> findAllWidgets(HttpSession session) {
+        List<Object> wids=new ArrayList<Object>();
+        hrepo.findAll().forEach(x->wids.add(new WidgetReturnStructure(x)));
+        iRepo.findAll().forEach(x->wids.add(new WidgetReturnStructure(x)));
+        linkrepo.findAll().forEach(x->wids.add(new WidgetReturnStructure(x)));
+        listRepo.findAll().forEach(x->wids.add(new WidgetReturnStructure(x)));
+        prepo.findAll().forEach(x->wids.add(new WidgetReturnStructure(x)));
+        return wids;
     }
 
     @GetMapping("/api/topic/{tid}")
@@ -90,6 +119,7 @@ public class TopicService {
     @DeleteMapping("/api/topic/{tid}")
     public void deleteTopic(
             @PathVariable("tid") long id) {
+        wrepo.deleteByTopicId(id);
         repo.deleteById(id);
     }
 }

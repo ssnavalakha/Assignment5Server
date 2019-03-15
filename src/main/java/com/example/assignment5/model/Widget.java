@@ -6,6 +6,7 @@ import java.util.List;
 
 @Entity
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
 public class Widget {
 
     @Id
@@ -18,16 +19,19 @@ public class Widget {
     private long up;
     private long down;
     private String type;
-    
+
+    private long ddType;
+
     public Widget(){}
     public Widget(long id, Topic topic, long position,
-                  long up, long down, String type) {
+                  long up, long down, String type,long ddType) {
         this.id = id;
         this.topic = topic;
         this.position = position;
         this.up = up;
         this.down = down;
         this.type = type;
+        this.ddType=ddType;
     }
 
     public long getId() {
@@ -77,4 +81,8 @@ public class Widget {
     public void setType(String type) {
         this.type = type;
     }
+
+    public void setDdType(long ddType){this.ddType=ddType;}
+
+    public long getDdType(){return this.ddType;}
 }

@@ -2,6 +2,7 @@ package com.example.assignment5.service;
 
 import com.example.assignment5.model.LinkWidget;
 import com.example.assignment5.repositories.LinkWidgetRepository;
+import com.example.assignment5.repositories.WidgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,8 @@ import java.util.Optional;
 public class LinkWidgetService {
     @Autowired
     LinkWidgetRepository repo;
+    @Autowired
+    WidgetRepository wrepo;
 
     @GetMapping("/api/link/widget/{wid}")
     public LinkWidget findWidgetById(
@@ -34,10 +37,12 @@ public class LinkWidgetService {
                 y.setDown(w.getDown());
                 y.setHref(w.getHref());
                 y.setPosition(w.getPosition());
-                y.setTopic(w.getTopic());
+                //y.setTopic(w.getTopic());
                 y.setTitle(w.getTitle());
                 y.setUp(w.getUp());
                 y.setType(w.getType());
+                if(!y.getType().equals("LINK"))
+                    wrepo.deleteById(y.getId());
                 repo.save(y);
             });
         return temp[0];

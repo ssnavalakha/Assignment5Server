@@ -13,6 +13,8 @@ import java.util.Optional;
 public class ParagraphWidgetService {
     @Autowired
     ParagraphWidgetRepository repo;
+    @Autowired
+    WidgetRepository wrepo;
 
     @GetMapping("/api/paragraph/widget/{wid}")
     public ParagraphWidget findWidgetById(
@@ -35,9 +37,11 @@ public class ParagraphWidgetService {
                 y.setDown(w.getDown());
                 y.setPosition(w.getPosition());
                 y.setText(w.getText());
-                y.setTopic(w.getTopic());
+                //y.setTopic(w.getTopic());
                 y.setUp(w.getUp());
                 y.setType(w.getType());
+                if(!y.getType().equals("PARAGRAPH"))
+                    wrepo.deleteById(y.getId());
                 repo.save(y);
             });
         return temp[0];

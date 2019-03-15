@@ -6,6 +6,8 @@ import com.example.assignment5.model.Module;
 import com.example.assignment5.model.Topic;
 import com.example.assignment5.repositories.LessonRepository;
 import com.example.assignment5.repositories.ModuleRepository;
+import com.example.assignment5.repositories.TopicRepository;
+import com.example.assignment5.repositories.WidgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,12 @@ public class LessonService {
 
     @Autowired
     ModuleRepository mrepo;
+
+    @Autowired
+    TopicRepository trepo;
+
+    @Autowired
+    WidgetRepository wrepo;
 
     @PostMapping(path = "/api/module/{mid}/lesson", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -72,6 +80,11 @@ public class LessonService {
     @DeleteMapping("/api/lesson/{lid}")
     public void deleteLesson(
             @PathVariable("lid") long id) {
+        List<Topic> t=trepo.findTopicByLid(id);
+        for (int i=0;i<t.size();i++) {
+            wrepo.deleteByTopicId(t.get(i).getId());
+        }
+        trepo.deleteByLessonId(id);
        repo.deleteById(id);
     }
 }
