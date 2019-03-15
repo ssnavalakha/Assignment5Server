@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,6 +24,11 @@ public class LinkWidgetService {
         if(t.isPresent())
             return t.get();
         return null;
+    }
+
+    @GetMapping("/api/link/widget/")
+    public List<LinkWidget> findAllLinkWidget(){
+        return (List<LinkWidget>) repo.findAll();
     }
 
     @PutMapping(path = "/api/link/widget/{wid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,6 +24,10 @@ public class ParagraphWidgetService {
         if(t.isPresent())
             return t.get();
         return null;
+    }
+    @GetMapping("/api/paragraph/widget/")
+    public List<ParagraphWidget> findAllParagraphWidget(){
+        return (List<ParagraphWidget>) repo.findAll();
     }
 
     @PutMapping(path = "/api/paragraph/widget/{wid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}

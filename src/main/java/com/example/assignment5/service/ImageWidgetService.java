@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,6 +24,11 @@ public class ImageWidgetService {
         if(t.isPresent())
             return t.get();
         return null;
+    }
+
+    @GetMapping("/api/image/widget/")
+    public List<ImageWidget> findAllImageWidget(){
+        return (List<ImageWidget>) repo.findAll();
     }
 
     @PutMapping(path = "/api/image/widget/{wid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
