@@ -38,6 +38,12 @@ public class CourseService {
         repo.save(crs);
         return crs;
     }
+    @GetMapping("/api/allcourses")
+    public List<Course> findAllLessons(HttpSession session) {
+        List<Course> all=new ArrayList<Course>();
+        repo.findAll().forEach(all::add);
+        return all;
+    }
     @GetMapping("/api/courses")
     public List<Course> findAllCourses(HttpSession session) {
         List<Course> all=new ArrayList<Course>();

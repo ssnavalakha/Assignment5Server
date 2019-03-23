@@ -46,6 +46,13 @@ public class ModuleService {
         return repo.findModulesByCid(cid);
     }
 
+    @GetMapping("/api/modules")
+    public List<Module> findAllModules(HttpSession session) {
+        List<Module> all=new ArrayList<Module>();
+        repo.findAll().forEach(all::add);
+        return all;
+    }
+
     @GetMapping("/api/modules/{mid}")
     public Module findModuleById(
             @PathVariable("mid") long id) {
