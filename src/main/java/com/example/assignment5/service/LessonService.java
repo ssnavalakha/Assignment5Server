@@ -43,6 +43,13 @@ public class LessonService {
         return newLesson;
     }
 
+    @GetMapping("/api/lessons")
+    public List<Lesson> findAllLessons(HttpSession session) {
+        List<Lesson> all=new ArrayList<Lesson>();
+        repo.findAll().forEach(all::add);
+        return all;
+    }
+
     @GetMapping("/api/module/{mid}/lesson")
     public List<Lesson> findAllLessons(@PathVariable("mid")long mid,
                                        HttpSession session) {

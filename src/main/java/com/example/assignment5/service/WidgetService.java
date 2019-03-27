@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,13 @@ public class WidgetService {
         if(t.isPresent())
             return t.get();
         return null;
+    }
+
+    @GetMapping("/api/widgets")
+    public List<Widget> findAllWidgets(HttpSession session) {
+        List<Widget> all=new ArrayList<Widget>();
+        repo.findAll().forEach(all::add);
+        return all;
     }
 
     @PutMapping(path = "/api/widget/{wid}",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}

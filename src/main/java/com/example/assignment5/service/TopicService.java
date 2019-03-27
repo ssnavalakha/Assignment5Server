@@ -71,6 +71,13 @@ public class TopicService {
         return repo.findTopicByLid(lid);
     }
 
+    @GetMapping("/api/topics")
+    public List<Topic> findAllTopics(HttpSession session) {
+        List<Topic> all=new ArrayList<Topic>();
+        repo.findAll().forEach(all::add);
+        return all;
+    }
+
     @GetMapping("/api/topic/{tid}/widget")
     public List<Widget> findAllWidgetsForTopic(@PathVariable("tid")long tid,
                                      HttpSession session) {
